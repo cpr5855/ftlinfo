@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FTL info
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  Enhance the fencing event pages with interactive competitor data, debugging, event details, and structured tooltip display.
 // @author       Your Name
 // @match        https://www.fencingtimelive.com/pools/scores/*
@@ -61,11 +61,12 @@
     const dataUrl = `https://www.fencingtimelive.com/events/competitors/data/${eventId}?sort=name`;
 
     // Initial UI elements for feedback
-    const banner = document.createElement('div');
-    banner.textContent = `Script running: Event ID - ${eventId}, Fetching from - ${dataUrl}`;
-    banner.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; background-color: #0f62fe; color: #fff; text-align: center; padding: 10px; z-index: 10000;';
-    document.body.appendChild(banner);
-
+    if (debugMode) {
+        const banner = document.createElement('div');
+        banner.textContent = `Script running: Event ID - ${eventId}, Fetching from - ${dataUrl}`;
+        banner.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; background-color: #0f62fe; color: #fff; text-align: center; padding: 10px; z-index: 10000;';
+        document.body.appendChild(banner);
+    }
     const consoleArea = document.createElement('div');
     consoleArea.style.cssText = 'position: fixed; bottom: 0; left: 0; width: 100%; background-color: #3d3d3d; color: #fff; text-align: left; padding: 10px; font-family: monospace; z-index: 10000; overflow: auto; height: 100px;';
     document.body.appendChild(consoleArea);
