@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         FTL rating info
+// @name         FTL Rating Info
 // @namespace    http://digitaldumptser.net/
-// @version      1.5
+// @version      1.6
 // @description  Enhance the fencing event pages with interactive competitor data, debugging, event details, and reliable tooltip display.
-// @author       Your Name
+// @author       Chris Rose
 // @match        https://www.fencingtimelive.com/pools/scores/*
 // @match        https://www.fencingtimelive.com/pools/details/*
 // @grant        GM_xmlhttpRequest
