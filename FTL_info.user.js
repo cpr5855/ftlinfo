@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         FTL info
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Enhance the fencing event pages with interactive competitor data, debugging, event details, and structured tooltip display.
 // @author       Your Name
 // @match        https://www.fencingtimelive.com/pools/scores/*
+// @match        https://www.fencingtimelive.com/pools/details/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_addStyle
 // @update URL https://github.com/cpr5855/ftlinfo/raw/main/FTL_info.user.js
