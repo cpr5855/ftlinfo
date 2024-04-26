@@ -6,6 +6,8 @@
 // @author       Chris Rose
 // @match        https://www.fencingtimelive.com/pools/scores/*
 // @match        https://www.fencingtimelive.com/pools/details/*
+// @update URL https://github.com/cpr5855/ftlinfo/raw/main/FTL_info.user.js
+// @downloadURL https://github.com/cpr5855/ftlinfo/raw/main/FTL_info.user.js
 // @grant        GM_xmlhttpRequest
 // @grant        GM_addStyle
 // ==/UserScript==
