@@ -1,72 +1,85 @@
 // ==UserScript==
-// @name         Fencing Event Competitor Info Enhancer
-// @namespace    http://tampermonkey.net/
-// @version      1.3
-// @description  Enhance the fencing event pages with interactive competitor data and dynamic content update.
-// @author       Your Name
+// @name         FTL Info
+// @namespace    http://digitaldumptser.net/
+// @version      1.5.verified
+// @description  Enhance the fencing event pages with interactive competitor data, debugging, event details, and reliable tooltip display.
+// @author       Chris Rose
 // @match        https://www.fencingtimelive.com/pools/scores/*
+// @match        https://www.fencingtimelive.com/pools/details/*
 // @grant        GM_xmlhttpRequest
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    const debugMode = true; // Set to false to disable debug banners
+    const debugMode = false; // Toggle for debug mode
 
-    // Initial UI elements for feedback, shown only if debug mode is enabled
+    // Initial UI elements for feedback
     const banner = document.createElement('div');
-    const consoleArea = document.createElement('div');
-    if (debugMode) {
-        banner.textContent = "The Fencing Event Competitor Info Enhancer Script is running...";
-        banner.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; background-color: #0f62fe; color: #fff; text-align: center; padding: 10px; z-index: 10000;';
-        document.body.appendChild(banner);
+    banner.textContent = 'Initializing...';
+    banner.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; background-color: #0f62fe; color: #fff; text-align: center; padding: 10px; z-index: 10000; display: none;';
+    document.body.appendChild(banner);
 
-        consoleArea.style.cssText = 'position: fixed; bottom: 0; left: 0; width: 100%; background-color: #3d3d3d; color: #fff; text-align: left; padding: 10px; font-family: monospace; z-index: 10000; overflow: auto; height: 100px;';
-        document.body.appendChild(consoleArea);
+    const consoleArea = document.createElement('div');
+    consoleArea.style.cssText = 'position: fixed; bottom: 0; left: 0; width: 100%; background-color: #3d3d3d; color: #fff; text-align: left; padding: 10px; font-family: monospace; z-index: 10000; overflow: auto; height: 100px; display: none;';
+    document.body.appendChild(consoleArea);
+
+    if (debugMode) {
+        banner.style.display = 'block';
+        consoleArea.style.display = 'block';
     }
 
-    // Extract the event ID from the URL
+    // Extract the event ID and construct the data URL
     const eventId = window.location.pathname.split('/')[3];
     const dataUrl = `https://www.fencingtimelive.com/events/competitors/data/${eventId}?sort=name`;
 
-    // Fetch competitors data
     function fetchCompetitorsData() {
-        if (debugMode) banner.textContent = "Fetching competitors' data...";
+        banner.textContent = `Fetching competitors' data from ${dataUrl}...`;
         GM_xmlhttpRequest({
             method: "GET",
             url: dataUrl,
             onload: function(response) {
-                if (response.status_code === 200) {
+                try {
                     const competitors = JSON.parse(response.responseText);
-                    enhancePageWithCompetitorData(competitors);
-                    if (debugMode) banner.textContent = "Data fetched and page enhanced.";
-                } else {
-                    if (debugMode) banner.textContent = "Failed to fetch data.";
+                    if (debugMode) {
+                        console.log("Competitors JSON:", competitors);
+                        consoleArea.textContent = `Fetched JSON data: ${JSON.stringify(competitors, null, 2)}\n`;
+                    }
+                    banner.textContent = `Data fetched from ${dataUrl}. Enhancing page...`;
+                    enhancePageWithCompetitorLinks(competitors);
+                } catch (e) {
+                    banner.textContent = `Error parsing JSON data from ${dataUrl}.`;
+                    consoleArea.textContent += "Error parsing JSON: " + e.message + "\n";
                 }
+            },
+            onerror: function(error) {
+                banner.textContent = `Failed to fetch data from ${dataUrl}.`;
+                consoleArea.textContent += "Error fetching data: " + error + "\n";
             }
         });
     }
 
-    // Enhance the page by appending weapon rating to the poolAffil span
-    function enhancePageWithCompetitorData(competitors) {
-        const rows = document.querySelectorAll('table tbody tr');
+    function enhancePageWithCompetitorLinks(competitors) {
+        const rows = document.querySelectorAll('table tbody tr.poolRow');
+        let found = 0;
+        let updated = 0;
         rows.forEach(row => {
-            const nameCell = row.querySelector('.poolCompName');
+            let nameCell = row.querySelector('.poolCompName');
             if (nameCell) {
                 const name = nameCell.textContent.trim();
                 const competitor = competitors.find(comp => comp.name === name);
-                if (competitor && competitor.weaponRating) {
-                    const affilCell = row.querySelector('.poolAffil');
-                    const weaponRatingSpan = document.createElement('span');
-                    weaponRatingSpan.className = 'WeaponRating';
-                    weaponRatingSpan.textContent = competitor.weaponRating;
-                    affilCell.appendChild(document.createElement('br'));
-                    affilCell.appendChild(weaponRatingSpan);
+                if (competitor) {
+                    nameCell.textContent = `${name} | ${competitor.weaponRating}`;
+                    updated++;
                 }
+                found++;
             }
         });
         if (debugMode) {
-            consoleArea.textContent = `Page enhancement complete. ${competitors.length} competitors processed.`;
+            consoleArea.textContent += `Total competitors found: ${found}\n`;
+            consoleArea.textContent += `Competitors updated with ratings: ${updated}\n`;
+            banner.textContent = `Page enhancement complete. Event ID - ${eventId}`;
         }
     }
 
